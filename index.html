@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dossier Rénovation Grange Freya</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f5f3ef;--card:#fff;--border:#ddd9d0;--text:#1a1917;--muted:#7a776f;--hint:#a8a49b;--accent:#c45a2d;--accent-bg:#fef0ea;--accent-dark:#8b3a18;--red:#a32d2d;--red-bg:#fcebeb;--teal:#0f6e56;--teal-bg:#e1f5ee;--teal-dark:#085041;--blue:#185fa5;--blue-bg:#e6f1fb;--blue-dark:#0c447c;--amber:#854f0b;--amber-bg:#faeeda;--amber-dark:#633806;--purple:#534ab7;--purple-bg:#eeedfe;--purple-dark:#3c3489;--pink:#993556;--pink-bg:#fbeaf0;--pink-dark:#72243e;--gray:#5f5e5a;--gray-bg:#f1efe8;--gray-dark:#444441;--green:#3b6d11;--green-bg:#eaf3de;--green-dark:#27500a;--success-bg:#eaf3de;--success:#3b6d11}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
+.header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:3px solid var(--accent)}
+.header h1{font-size:2.2rem;font-weight:700;letter-spacing:-0.03em;line-height:1.15;margin-bottom:0.15rem}
+.header h1 span{color:var(--accent)}
+.header .sub{color:var(--muted);font-size:0.95rem;margin-bottom:1rem}
+.header .meta{display:flex;gap:1.25rem;flex-wrap:wrap}
+.header .meta-item{font-size:0.8rem;color:var(--muted);display:flex;align-items:center;gap:4px}
+.header .meta-item i{font-size:15px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;border-bottom:1px solid var(--border);overflow-x:auto}
+.tab{padding:9px 16px;background:transparent;color:var(--muted);border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;font-size:0.85rem;font-weight:600;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none}.tab-content.active{display:block}
+.budget-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:1.5rem}
+.budget-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1rem}
+.budget-card.accent{border-color:var(--accent);border-width:2px}
+.budget-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:2px}
+.budget-val{font-size:1.3rem;font-weight:700;letter-spacing:-0.02em}
+.budget-card.accent .budget-val{color:var(--accent-dark)}
+.progress-wrap{margin-bottom:1.5rem}
+.progress-info{display:flex;justify-content:space-between;font-size:0.8rem;color:var(--muted);margin-bottom:5px}
+.progress-track{height:8px;background:var(--gray-bg);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:4px;width:0%}
+.share-btn{background:var(--accent);color:#fff;border:none;padding:4px 10px;border-radius:6px;font-family:inherit;font-size:0.7rem;font-weight:600;cursor:pointer;letter-spacing:0.02em}
+.share-btn:hover{background:var(--accent-dark)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:10px 18px;border-radius:8px;font-size:0.85rem;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.2);display:none;z-index:1000}
+.section-sep{display:flex;align-items:center;gap:10px;margin:2rem 0 0.75rem;font-size:0.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em}
+.section-sep::after{content:'';flex:1;height:1px;background:var(--border)}
+.section-sep i{font-size:16px}
+.phase{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.phase-header{padding:0.9rem 1.1rem;cursor:pointer;display:flex;align-items:center;gap:10px}
+.phase-num{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.7rem;flex-shrink:0}
+.phase-info{flex:1;min-width:0}
+.phase-title{font-weight:600;font-size:0.9rem}
+.phase-meta{font-size:0.72rem;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.arrow-ph{transition:transform 0.2s;font-size:14px;color:var(--hint)}
+.phase.open .arrow-ph{transform:rotate(90deg)}
+.phase-body{display:none;padding:0 1.1rem 1.1rem;border-top:1px solid var(--border);margin-top:0.4rem}
+.phase.open .phase-body{display:block}
+.task-section{margin-top:0.9rem}
+.task-section-title{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:6px}
+.task{display:flex;gap:8px;align-items:flex-start;padding:3px 0;font-size:0.82rem}
+.chk{width:17px;height:17px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;cursor:pointer;background:var(--card);margin-top:1px}
+.chk.done{background:var(--success-bg);border-color:var(--success)}
+.chk.done::after{content:'\ea5e';font-family:'tabler-icons';font-size:11px;color:var(--success);display:flex;align-items:center;justify-content:center;height:100%}
+.task-text.crossed{text-decoration:line-through;color:var(--hint)}
+.mat-table{width:100%;border-collapse:collapse;font-size:0.78rem;margin-top:6px}
+.mat-table th{text-align:left;font-weight:600;color:var(--muted);font-size:0.68rem;text-transform:uppercase;padding:5px 6px;border-bottom:1px solid var(--border)}
+.mat-table td{padding:5px 6px;border-bottom:1px solid #f0ede7;vertical-align:top}
+.mat-table tr:last-child td{border-bottom:none}
+.badge{display:inline-block;font-size:0.62rem;font-weight:600;padding:2px 7px;border-radius:6px}
+.badge-wait{background:var(--amber-bg);color:var(--amber-dark)}
+.badge-pro{background:var(--blue-bg);color:var(--blue-dark)}
+.badge-gA{background:var(--accent-bg);color:var(--accent-dark)}
+.badge-gB{background:var(--purple-bg);color:var(--purple-dark)}
+.badge-budget{background:var(--green-bg);color:var(--green-dark)}
+.badge-solo{background:var(--gray-bg);color:var(--gray-dark)}
+.badge-coup{background:var(--teal-bg);color:var(--teal-dark)}
+.badge-parti{background:var(--pink-bg);color:var(--pink-dark)}
+.badge-no{background:var(--green-bg);color:var(--green-dark)}
+.tip{font-size:0.76rem;color:var(--amber-dark);margin-top:8px;padding:7px 10px;background:var(--amber-bg);border-radius:7px;display:flex;gap:6px}
+.tip i{flex-shrink:0;margin-top:2px;font-size:13px}
+.tip-green{color:var(--teal-dark);background:var(--teal-bg)}
+.tip-pink{color:var(--pink-dark);background:var(--pink-bg)}
+.team-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.5rem;font-size:0.72rem;color:var(--muted);padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px}
+.plan-img{width:100%;border:1px solid var(--border);border-radius:10px;display:block;margin-bottom:1rem}
+.legend{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem}
+.legend h3{font-size:0.95rem;font-weight:600;margin-bottom:0.75rem}
+.legend-item{display:flex;align-items:center;gap:10px;padding:4px 0;font-size:0.85rem}
+.legend-color{width:20px;height:12px;border-radius:3px;flex-shrink:0}
+.shop-cat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px}
+.shop-cat h3{font-size:1rem;font-weight:600;margin-bottom:0.5rem;display:flex;align-items:center;gap:8px}
+.shop-cat h3 i{font-size:18px;color:var(--accent)}
+.shop-supplier{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-top:0.75rem;margin-bottom:0.25rem;font-weight:600}
+.shop-total{font-size:0.85rem;font-weight:600;color:var(--accent-dark);margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border);display:flex;justify-content:space-between}
+.footer{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--border);font-size:0.72rem;color:var(--hint);text-align:center}
+@media(max-width:600px){.budget-grid{grid-template-columns:1fr 1fr}.header h1{font-size:1.6rem}.container{padding:1rem}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+  <h1>Rénovation <span>Grange Freya</span></h1>
+  <p class="sub">Perche / Orne — Nicolas Charlier — Dossier travaux & planning optimisé</p>
+  <div class="meta">
+    <span class="meta-item"><i class="ti ti-calendar"></i> 5–6 mois</span>
+    <span class="meta-item"><i class="ti ti-hammer"></i> ~35–45 jours</span>
+    <span class="meta-item"><i class="ti ti-hourglass"></i> ~10 sem. séchage</span>
+    <span class="meta-item"><i class="ti ti-home"></i> Grange A + B</span>
+  </div>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="showTab(event,'planning')">Planning</button>
+  <button class="tab" onclick="showTab(event,'plan')">Plan</button>
+  <button class="tab" onclick="showTab(event,'shop')">Fiche d'achat</button>
+</div>
+<div id="planning" class="tab-content active">
+<div class="budget-grid">
+  <div class="budget-card"><div class="budget-label">Grange A</div><div class="budget-val">2 307 €</div></div>
+  <div class="budget-card"><div class="budget-label">Grange B</div><div class="budget-val">8 602 €</div></div>
+  <div class="budget-card accent"><div class="budget-label">Total projet</div><div class="budget-val">10 909 €</div></div>
+  <div class="budget-card"><div class="budget-label">Rampants (aides)</div><div class="budget-val">~3 500 €</div></div>
+</div>
+<div class="progress-wrap"><div class="progress-info"><span>Avancement <button class="share-btn" onclick="shareProgress()" title="Copier un lien pour partager ou ouvrir sur un autre appareil"><i class="ti ti-share"></i> Partager</button></span><span id="pct">0 %</span></div><div class="progress-track"><div class="progress-fill" id="pbar"></div></div></div>
+<div id="toast" class="toast"></div>
+<div class="team-legend"><span><span class="badge badge-solo">Solo 1–2</span> précision</span><span><span class="badge badge-coup">Coup 3–4</span> bonne cadence</span><span><span class="badge badge-parti">Participatif 5–6</span> prévoir repas !</span></div>
+<div class="section-sep"><i class="ti ti-arrow-down"></i> Bloc 1 — Haut & sale</div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--amber-bg);color:var(--amber-dark)">01</div><div class="phase-info"><div class="phase-title">Isolation rampants ~80 m²</div><div class="phase-meta"><span>2–3 j</span><span class="badge badge-pro">artisan RGE</span><span class="badge badge-budget">~3 500 €</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">3 devis RGE + MaPrimeRénov + valider aides AVANT travaux</span></div><div class="tip tip-green"><i class="ti ti-check"></i> En premier : plus salissant + plus en hauteur.</div></div></div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--blue-bg);color:var(--blue-dark)">02</div><div class="phase-info"><div class="phase-title">Plancher bois étage (~45 m²)</div><div class="phase-meta"><span>3–4 j</span><span class="badge badge-coup">3–4 pers.</span><span class="badge badge-budget">2 600 €</span><span class="badge badge-gB">Grange B</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Solivage 63×175 (34×3,40m) + Métisse RT 120 + OSB 22 + Vélaphone + BA13</span></div></div></div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--red-bg);color:var(--red)">03</div><div class="phase-info"><div class="phase-title">Démolition dalle (~5 m²)</div><div class="phase-meta"><span>1–2 j</span><span class="badge badge-coup">3–4</span><span class="badge badge-gB">B</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Casser + évacuer + décaisser + compacter</span></div></div></div>
+<div class="section-sep"><i class="ti ti-eye-off"></i> Bloc 2 — Réseaux cachés</div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--red-bg);color:var(--red)">04</div><div class="phase-info"><div class="phase-title">Réseaux sol + élec murale + VMC</div><div class="phase-meta"><span>6–10 j</span><span class="badge badge-budget">1 203 €</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task-section"><div class="task-section-title">Sol (voir Plan)</div><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Décharges PVC: douche, lavabo, évier, toilette</span></div><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Eau chaude + eau froide (PER/multicouche)</span></div><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Chauffage étage + élec GA + gaine audio rouge + fibre x3</span></div></div><div class="task-section"><div class="task-section-title">Murs avant chaux-chanvre</div><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">5 interrupteurs + prises/boîtes Niloé encastrées</span></div></div><div class="tip"><i class="ti ti-alert-triangle"></i> Tout noyé chape/enduits = MAINTENANT.</div></div></div>
+<div class="section-sep"><i class="ti ti-wall"></i> Bloc 3 — Murs (sol brut = zéro bâche)</div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--teal-bg);color:var(--teal-dark)">05</div><div class="phase-info"><div class="phase-title">Chaux-chanvre corps d'enduit</div><div class="phase-meta"><span>10–15 j</span><span class="badge badge-parti">5–6 pers.</span><span class="badge badge-budget">4 921 €</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Gobetis + projection (A:185m² + B:52,5m²) ép. 8cm + talochage</span></div><div class="tip tip-pink"><i class="ti ti-friends"></i> Participatif : 2 gâchage, 2 projection, 2 talochage !</div></div></div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--amber-bg);color:var(--amber-dark)">06</div><div class="phase-info"><div class="phase-title">Séchage chaux-chanvre</div><div class="phase-meta"><span class="badge badge-wait">3–4 semaines</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Ventiler + commander matériel + acheter bois escalier</span></div></div></div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--teal-bg);color:var(--teal-dark)">07</div><div class="phase-info"><div class="phase-title">Chaux-terre finition murs</div><div class="phase-meta"><span>5–7 j</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">NHL 3.5 + sable 0/4 → 5 mm → lisser</span></div></div></div>
+<div class="section-sep"><i class="ti ti-flame"></i> Bloc 4 — Sol & chauffage</div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--blue-bg);color:var(--blue-dark)">08</div><div class="phase-info"><div class="phase-title">Plancher chauffant — circuits</div><div class="phase-meta"><span>5–7 j</span><span class="badge badge-budget">2 350 €</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Isolant + plots + PER BAO 600m + collecteurs</span></div></div></div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--blue-bg);color:var(--blue-dark)">09</div><div class="phase-info"><div class="phase-title">Test pression + raccord PAC</div><div class="phase-meta"><span>1–2 j</span><span class="badge badge-pro">plombier</span><span class="badge badge-budget">600 €</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">6 bars 24h + vanne mélangeuse + ballon tampon + circulateur</span></div></div></div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--gray-bg);color:var(--gray-dark)">10</div><div class="phase-info"><div class="phase-title">Chape anhydrite + séchage</div><div class="phase-meta"><span>1 j</span><span class="badge badge-pro">toupie</span><span class="badge badge-wait">+ 3–4 sem.</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Chape 5cm sous pression + séchage 21–28j</span></div><div class="tip tip-pink"><i class="ti ti-clock"></i> Fabriquer escalier en atelier pendant séchage !</div></div></div>
+<div class="section-sep"><i class="ti ti-paint"></i> Bloc 5 — Finitions</div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--purple-bg);color:var(--purple-dark)">11</div><div class="phase-info"><div class="phase-title">Appareillage élec + VMC</div><div class="phase-meta"><span>2 j</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Clipser Niloé + tableau + luminaires + groupes VMC</span></div></div></div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--purple-bg);color:var(--purple-dark)">12</div><div class="phase-info"><div class="phase-title">SDB + WC (5,34 m²)</div><div class="phase-meta"><span>3–4 j</span><span class="badge badge-budget">1 350 €</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Douche 80×80 + WC Geberit + lavabo + raccords + fenêtre</span></div></div></div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--green-bg);color:var(--green-dark)">13</div><div class="phase-info"><div class="phase-title">Vitrificateur béton 80 m²</div><div class="phase-meta"><span>2–3 j</span><span class="badge badge-budget">400 €</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Poncer + primaire + 2 couches PU + séchage 72h</span></div></div></div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--green-bg);color:var(--green-dark)">14</div><div class="phase-info"><div class="phase-title">Plinthes sapin avec câbles</div><div class="phase-meta"><span>2–3 j</span><span class="badge badge-budget">~300 €</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Débiter + raboter + fraiser canal + coupes 45° + fixer + finition</span></div></div></div>
+<div class="phase" onclick="togglePhase(this)"><div class="phase-header"><div class="phase-num" style="background:var(--pink-bg);color:var(--pink-dark)">15</div><div class="phase-info"><div class="phase-title">Escalier 1/4 tournant — 14 marches</div><div class="phase-meta"><span>8–10 j</span><span class="badge badge-budget">1 000 €</span></div></div><i class="ti ti-chevron-right arrow-ph"></i></div><div class="phase-body"><div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Hêtre marches + sapin limons — fabrication atelier + pose</span></div></div></div>
+</div>
+<div id="plan" class="tab-content">
+<h2 style="font-size:1.3rem;font-weight:600;margin-bottom:0.5rem">Plan de la grange — réseaux</h2>
+<p style="color:var(--muted);font-size:0.9rem;margin-bottom:1.25rem">Tracé des lignes électriques, eau, chauffage et fibre à intégrer AVANT enduits et chape.</p>
+<img src="grange_plan.png" class="plan-img" alt="Plan de la grange — réseaux électricité, eau, chauffage, audio, fibre">
+<div class="legend">
+  <h3>Légende des tracés (du PDF)</h3>
+  <div class="legend-item"><span class="legend-color" style="background:#22c55e"></span>Vert — Électricité (prises + lumières + interrupteurs)</div>
+  <div class="legend-item"><span class="legend-color" style="background:#ef4444"></span>Rouge — Gaine câble audio</div>
+  <div class="legend-item"><span class="legend-color" style="background:#3b82f6"></span>Bleu — Eau chaude / froide + décharges</div>
+  <div class="legend-item"><span class="legend-color" style="background:#a855f7"></span>Violet — Circuit radiateur / chauffage étage</div>
+  <div class="legend-item"><span class="legend-color" style="background:#dc2626"></span>Rectangle rouge — Radiateur</div>
+</div>
+<div class="section-sep"><i class="ti ti-list"></i> Lignes à passer dans le sol AVANT chape</div>
+<div class="phase open"><div class="phase-body" style="display:block;padding:1rem 1.25rem;border-top:none">
+  <div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Décharges PVC : douche, lavabo, évier, toilette (pentes 1–2%)</span></div>
+  <div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Gaine + câble fibre — 3 lignes</span></div>
+  <div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Gaine rouge ICTA — câble audio</span></div>
+  <div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Électricité GA — prises + lumières</span></div>
+  <div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Chauffage étage (vers radiateur)</span></div>
+  <div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Eau chaude + eau froide (PER ou multicouche)</span></div>
+</div></div>
+<div class="section-sep"><i class="ti ti-bulb"></i> Interrupteurs à positionner (5)</div>
+<div class="phase open"><div class="phase-body" style="display:block;padding:1rem 1.25rem;border-top:none">
+  <div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Entrée chambre 15,79 m²</span></div>
+  <div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">SDB 4,96 m²</span></div>
+  <div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Entrée cuisine 20,97 m²</span></div>
+  <div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Côté cuisine</span></div>
+  <div class="task"><div class="chk" onclick="chk(event,this)"></div><span class="task-text">Grande pièce 45,42 m² (entrée)</span></div>
+</div></div>
+<div class="tip"><i class="ti ti-alert-triangle"></i> Toutes ces lignes AVANT chape et AVANT chaux-chanvre. Plus aucune modification possible ensuite.</div>
+</div>
+<div id="shop" class="tab-content">
+<h2 style="font-size:1.3rem;font-weight:600;margin-bottom:0.5rem">Fiche d'achat matériaux</h2>
+<p style="color:var(--muted);font-size:0.9rem;margin-bottom:1.25rem">Liste complète par poste avec fournisseurs. Total : 10 909 € + rampants ~3 500 €.</p>
+<div class="shop-cat"><h3><i class="ti ti-tools"></i> 01 — Plancher étage</h3>
+<div class="shop-supplier">Scierie locale</div><table class="mat-table"><tr><td>Bastaings 63×175 × 3,40 m</td><td>34</td><td>—</td></tr></table>
+<div class="shop-supplier">BricoDépôt</div><table class="mat-table"><tr><td>OSB 22 mm rainuré</td><td>~50 m²</td><td>~550 €</td></tr><tr><td>Placo BA13</td><td>50 m²</td><td>~200 €</td></tr><tr><td>Sabots SAE 64×84</td><td>68</td><td>~250 €</td></tr></table>
+<div class="shop-supplier">Saint-Gobain</div><table class="mat-table"><tr><td>Vélaphone Confort 2,5 mm</td><td>50 m²</td><td>~300 €</td></tr></table>
+<div class="shop-supplier">Materiaux-naturels.fr</div><table class="mat-table"><tr><td>Métisse RT 120 mm</td><td>~50 m²</td><td>~750 €</td></tr></table>
+<div class="shop-supplier">Fixations</div><table class="mat-table"><tr><td>Pointes CNA 4×50</td><td>1 200</td><td>—</td></tr><tr><td>Vis OSB 5×60</td><td>700</td><td>—</td></tr><tr><td>Vis placo 3,5×25</td><td>500</td><td>—</td></tr><tr><td>Bande résiliente</td><td>4 × 30 m</td><td>—</td></tr></table>
+<div class="shop-total"><span>Sous-total</span><span>2 600 €</span></div></div>
+<div class="shop-cat"><h3><i class="ti ti-bolt"></i> 02 — Électricité Niloé</h3>
+<div class="shop-supplier">123elec.com — Grange A (452 €)</div><table class="mat-table"><tr><th>Article</th><th>Qté</th><th>Prix</th></tr><tr><td>Prises 2P+T Niloé blanc</td><td>12</td><td>84 €</td></tr><tr><td>Inters va-et-vient</td><td>4</td><td>28 €</td></tr><tr><td>Plaques + boîtiers</td><td>32</td><td>56 €</td></tr><tr><td>R2V 3G2,5 100m + 3G1,5 50m</td><td>1+1</td><td>130 €</td></tr><tr><td>ICTA D20 100m + DCL + divers</td><td>1 lot</td><td>152 €</td></tr></table>
+<div class="shop-supplier">123elec.com — Grange B (351 €)</div><table class="mat-table"><tr><td>Prises + inters Niloé</td><td>16</td><td>112 €</td></tr><tr><td>Plaques + boîtiers + câbles + gaines</td><td>1 lot</td><td>239 €</td></tr></table>
+<div class="shop-total"><span>Sous-total</span><span>803 €</span></div></div>
+<div class="shop-cat"><h3><i class="ti ti-wall"></i> 03 — Chaux-chanvre + finition</h3>
+<div class="shop-supplier">Materiaux-naturels.fr</div><table class="mat-table"><tr><td>Chènevotte Biofibat 200L (A)</td><td>74 sacs</td><td>1 330 €</td></tr><tr><td>Chènevotte Biofibat 200L (B)</td><td>21 sacs</td><td>380 €</td></tr></table>
+<div class="shop-supplier">Sainbiose</div><table class="mat-table"><tr><td>Batichanvre 25 kg (A)</td><td>74 sacs</td><td>1 630 €</td></tr><tr><td>Batichanvre 25 kg (B)</td><td>21 sacs</td><td>460 €</td></tr></table>
+<div class="shop-supplier">Chausson Matériaux</div><table class="mat-table"><tr><td>Gobetis accroche</td><td>25 sacs</td><td>375 €</td></tr><tr><td>Chaux NHL 3.5 finition</td><td>29 sacs</td><td>522 €</td></tr><tr><td>Sable 0/4 carrière</td><td>4,5 m³</td><td>225 €</td></tr></table>
+<div class="shop-total"><span>Sous-total</span><span>4 921 €</span></div></div>
+<div class="shop-cat"><h3><i class="ti ti-flame"></i> 04 — Plancher chauffant</h3>
+<div class="shop-supplier">Plomberie-Pro</div><table class="mat-table"><tr><td>Tube PER BAO 13×16</td><td>600 m</td><td>450–620 €</td></tr><tr><td>Bande périphérique</td><td>60 ml</td><td>50–80 €</td></tr><tr><td>Kit régulation 3 zones</td><td>1</td><td>250–400 €</td></tr></table>
+<div class="shop-supplier">Cedeo</div><table class="mat-table"><tr><td>Collecteur Altech inox 6 départs</td><td>2</td><td>360–500 €</td></tr></table>
+<div class="shop-supplier">BricoDépôt</div><table class="mat-table"><tr><td>Isolant TH38 + plots</td><td>80 m²</td><td>400–500 €</td></tr><tr><td>Additif chape</td><td>1 lot</td><td>50–80 €</td></tr></table>
+<div class="shop-supplier">Toupie locale</div><table class="mat-table"><tr><td>Chape anhydrite 5 cm</td><td>~5 m³</td><td>1 100–1 500 €</td></tr></table>
+<div class="shop-total"><span>Sous-total</span><span>2 350 €</span></div></div>
+<div class="shop-cat"><h3><i class="ti ti-thermometer"></i> 05 — Hydraulique PAC</h3>
+<div class="shop-supplier">Cedeo</div><table class="mat-table"><tr><td>Vanne mélangeuse 3 voies</td><td>1</td><td>~150 €</td></tr><tr><td>Tête thermostatique 20–45°C</td><td>1</td><td>~50 €</td></tr><tr><td>Ballon tampon 50–80 L</td><td>1</td><td>~150 €</td></tr><tr><td>Circulateur Grundfos/DAB</td><td>1</td><td>~120 €</td></tr></table>
+<div class="shop-supplier">Discount-Plomberie</div><table class="mat-table"><tr><td>Multicouche isolé Ø20</td><td>30 m</td><td>~120 €</td></tr><tr><td>Raccords + traversées</td><td>1 lot</td><td>~80 €</td></tr></table>
+<div class="shop-total"><span>Sous-total</span><span>670 €</span></div></div>
+<div class="shop-cat"><h3><i class="ti ti-bath"></i> 06 — SDB + WC</h3>
+<div class="shop-supplier">BricoDépôt / Livea</div><table class="mat-table"><tr><td>Receveur 80×80 + paroi + colonne</td><td>1</td><td>~250 €</td></tr><tr><td>Pack WC Geberit suspendu</td><td>1</td><td>~280 €</td></tr><tr><td>Lavabo + robinet + siphon</td><td>1</td><td>~120 €</td></tr><tr><td>Fenêtre SDB</td><td>1</td><td>~400 €</td></tr><tr><td>Accessoires + silicone</td><td>1 lot</td><td>~45 €</td></tr></table>
+<div class="shop-supplier">Discount-Plomberie</div><table class="mat-table"><tr><td>Multicouche + raccords</td><td>1 lot</td><td>~180 €</td></tr><tr><td>PVC Ø100 + Ø40</td><td>1 lot</td><td>~75 €</td></tr></table>
+<div class="shop-total"><span>Sous-total</span><span>1 350 €</span></div></div>
+<div class="shop-cat"><h3><i class="ti ti-wind"></i> 07 — VMC simple flux</h3>
+<div class="shop-supplier">France-Ventilation</div><table class="mat-table"><tr><td>Kit VMC 4 bouches (Grange A)</td><td>1</td><td>~180 €</td></tr><tr><td>Kit VMC 3 bouches (Grange B)</td><td>1</td><td>~150 €</td></tr><tr><td>Gaine souple Ø80 + Ø125</td><td>30 m</td><td>~70 €</td></tr></table>
+<div class="shop-total"><span>Sous-total</span><span>400 €</span></div></div>
+<div class="shop-cat"><h3><i class="ti ti-paint"></i> 08 — Vitrificateur béton</h3>
+<div class="shop-supplier">Metaltop / BricoDépôt</div><table class="mat-table"><tr><td>Vitrificateur PU à l'eau</td><td>~16 L</td><td>~300 €</td></tr><tr><td>Rouleaux laqueur</td><td>3</td><td>~30 €</td></tr><tr><td>Bac + grille + masquage</td><td>2 lots</td><td>~60 €</td></tr></table>
+<div class="shop-total"><span>Sous-total</span><span>400 €</span></div></div>
+<div class="shop-cat"><h3><i class="ti ti-ruler"></i> 09 — Plinthes sapin</h3>
+<div class="shop-supplier">Scierie locale</div><table class="mat-table"><tr><td>Sapin brut 100×22 mm</td><td>~85 ml</td><td>~170 €</td></tr></table>
+<div class="shop-supplier">BricoDépôt</div><table class="mat-table"><tr><td>Vis inox 3,5×40 + chevilles</td><td>~200</td><td>~25 €</td></tr><tr><td>Fraise défonceuse 20 mm</td><td>1</td><td>~20 €</td></tr><tr><td>Abrasifs + huile/vernis 2L</td><td>1 lot</td><td>~55 €</td></tr><tr><td>Colle néoprène + joints</td><td>1 lot</td><td>~30 €</td></tr></table>
+<div class="shop-total"><span>Sous-total</span><span>300 €</span></div></div>
+<div class="shop-cat"><h3><i class="ti ti-stairs"></i> 10 — Escalier 1/4 tournant</h3>
+<div class="shop-supplier">Scierie — Hêtre LC</div><table class="mat-table"><tr><td>Marches 36 mm (6,5 m²)</td><td>14</td><td>~390 €</td></tr><tr><td>Poteaux 90×90 mm</td><td>3</td><td>~100 €</td></tr><tr><td>Main courante Ø45</td><td>5,5 ml</td><td>~75 €</td></tr><tr><td>Balustres 40×40</td><td>22</td><td>~90 €</td></tr></table>
+<div class="shop-supplier">Scierie — Sapin</div><table class="mat-table"><tr><td>Contremarches 18 mm</td><td>14</td><td>~60 €</td></tr><tr><td>Limons + angles 50 mm</td><td>4+2</td><td>~125 €</td></tr></table>
+<div class="shop-supplier">Quincaillerie</div><table class="mat-table"><tr><td>Vis + boulons + équerres</td><td>—</td><td>~80 €</td></tr><tr><td>Colle PU + abrasifs</td><td>—</td><td>~22 €</td></tr><tr><td>Scellement chimique M12</td><td>1 lot</td><td>~30 €</td></tr></table>
+<div class="shop-total"><span>Sous-total</span><span>1 000 €</span></div></div>
+<div class="shop-cat" style="border-color:var(--accent);border-width:2px"><h3 style="color:var(--accent-dark)"><i class="ti ti-receipt"></i> Total général</h3>
+<table class="mat-table"><tr><td>10 postes auto-construction</td><td style="text-align:right;font-weight:600">10 909 €</td></tr><tr><td>Isolation rampants (artisan RGE, après aides)</td><td style="text-align:right;font-weight:600">~3 500 €</td></tr><tr><td colspan="2" style="text-align:right;font-size:1.1rem;font-weight:700;color:var(--accent-dark);padding-top:10px">TOTAL ~14 409 €</td></tr></table></div>
+</div>
+<div class="footer">
+  <p>Grange Freya — 10 909 € + rampants ~3 500 € — 2026</p>
+  <p>haut → bas · sale → propre · caché → visible</p>
+</div>
+</div>
+<script>
+var SB_URL='https://oexsnpmqgvbkllnobcmz.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9leHNucG1xZ3Zia2xsbm9iY216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3ODYyNjgsImV4cCI6MjA5MTM2MjI2OH0.sDG1t6pskISPu6DQkSXMd_jpxZOq8NU0tJMnvhezPB0';
+var sb=window.supabase.createClient(SB_URL,SB_KEY);
+var saving=false;
+
+function showTab(e,id){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active')});e.target.classList.add('active');document.getElementById(id).classList.add('active');window.scrollTo(0,0)}
+function togglePhase(el){el.classList.toggle('open')}
+function chk(e,el){e.stopPropagation();el.classList.toggle('done');var t=el.nextElementSibling;if(t&&t.classList.contains('task-text'))t.classList.toggle('crossed',el.classList.contains('done'));saveState();updateProgress()}
+
+function saveState(){
+  var s=[];document.querySelectorAll('.chk').forEach(function(el){s.push(el.classList.contains('done')?1:0)});
+  try{localStorage.setItem('grange_freya_v1',JSON.stringify(s))}catch(e){}
+  if(saving)return;saving=true;
+  sb.from('grange_state').upsert({id:'main',state:s,updated_at:new Date().toISOString()}).then(function(){saving=false}).catch(function(){saving=false});
+}
+
+function applyState(s){
+  document.querySelectorAll('.chk').forEach(function(el,i){
+    var done=!!s[i];
+    el.classList.toggle('done',done);
+    var t=el.nextElementSibling;
+    if(t&&t.classList.contains('task-text'))t.classList.toggle('crossed',done);
+  });
+  updateProgress();
+}
+
+async function loadState(){
+  var s=null;
+  var h=location.hash;
+  if(h&&h.indexOf('s=')>-1){var enc=h.split('s=')[1].split('&')[0];s=decodeState(enc)}
+  if(!s){
+    try{
+      var res=await sb.from('grange_state').select('state').eq('id','main').single();
+      if(res.data&&res.data.state&&res.data.state.length>0)s=res.data.state;
+    }catch(e){}
+  }
+  if(!s){try{s=JSON.parse(localStorage.getItem('grange_freya_v1')||'[]')}catch(e){s=[]}}
+  applyState(s);
+}
+
+function encodeState(){var bits=[];document.querySelectorAll('.chk').forEach(function(el){bits.push(el.classList.contains('done')?1:0)});var bytes=[];for(var i=0;i<bits.length;i+=8){var b=0;for(var j=0;j<8&&i+j<bits.length;j++){if(bits[i+j])b|=(1<<j)}bytes.push(b)}var str=String.fromCharCode.apply(null,bytes);return btoa(str).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_')}
+function decodeState(s){try{s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';var bytes=atob(s);var bits=[];for(var i=0;i<bytes.length;i++){var b=bytes.charCodeAt(i);for(var j=0;j<8;j++)bits.push((b>>j)&1)}return bits}catch(e){return null}}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(function(){t.style.display='none'},2500)}
+function shareProgress(){var url=location.origin+location.pathname;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(function(){showToast('Lien copié ! Tout le monde verra le même avancement.')},function(){prompt('Copie ce lien :',url)})}else{prompt('Copie ce lien :',url)}}
+function resetState(){if(confirm('Tout décocher ?')){try{localStorage.removeItem('grange_freya_v1')}catch(e){}document.querySelectorAll('.chk.done').forEach(function(el){el.classList.remove('done');var t=el.nextElementSibling;if(t&&t.classList.contains('task-text'))t.classList.remove('crossed')});saveState();updateProgress()}}
+function updateProgress(){var a=document.querySelectorAll('.chk'),d=document.querySelectorAll('.chk.done');var p=a.length?Math.round(d.length/a.length*100):0;document.getElementById('pct').textContent=p+' %';document.getElementById('pbar').style.width=p+'%'}
+loadState();
+</script>
+</body>
+</html>
